@@ -1,15 +1,14 @@
-from random import choice
 from turtle import Turtle
 
 class TurtleRace:
-    def __init__(self): # source of truth stays in
+    def __init__(self):
         self.turtle = ''
         self.total = 50
         self.bet = 0
         
-    def keep_or_choose(self):
+    def keep_or_choose(self): # this is first function at start of loop
         if self.turtle != '':
-            keep = input('Would you like to keep your previous turtle? (y/n): ')
+            keep = input('Would you like to keep your previous turtle in the next race? (y/n): ')
             if keep.lower() == 'y':
                 print('Keeping %s as your turtle.' % self.turtle)
             elif keep.lower() == 'quit':
@@ -24,7 +23,8 @@ class TurtleRace:
     def chooseTurtle(self):
         active = True
         while active:
-            turtle = input('Inky (17%s chance to win)\nBlinky (22%s chance to win)\nPinky (28%s chance to win)\nClyde (33%s chance to win)\nPlease choose your turtle!: ')
+            print('The four turtles are Inky, Blinky, Pinky, and Clyde.\nYou can type their name or just the first letter.')
+            turtle = input('Inky (17%s chance to win)\nBlinky (22%s chance to win)\nPinky (28%s chance to win)\nClyde (33%s chance to win)\nPlease choose your turtle: ')
             if turtle.lower() == 'i' or turtle.lower() == 'inky':
                 self.turtle = 'Inky'
                 active = False
@@ -42,11 +42,12 @@ class TurtleRace:
             else:
                 print('Valid replies include: Inky, Blinky, Pinky, Clyde, I, B, P, C, or quit')
                 continue
+        print('You chose: ' + self.turtle)
     
     def setBet(self):
         active = True
         while active:
-            bet = input('You chose: ' + self.turtle + '\nOf %s, how much would you like to bet? ' % self.total)
+            bet = input('Of %s, how much would you like to bet? ' % self.total)
             if bet == 'quit':
                 quit()
             else:
@@ -55,8 +56,6 @@ class TurtleRace:
                 if bet < 1:
                     print('Cannot bet zero or less! ')
                     continue
-                elif bet == 'quit':
-                    quit()
                 elif bet > self.total:
                     print('Cannot bet more than you have! You have: %s' % self.total)
                     continue
@@ -65,7 +64,8 @@ class TurtleRace:
             
             confirm = input('Betting %s. Are you sure? (y/n): ' % self.bet)
             if confirm == 'n':
-                continue
+                active = False
+                self.unsure()
             elif confirm == 'y':
                 active = False
             elif bet == 'quit':
@@ -74,6 +74,21 @@ class TurtleRace:
                 print('Please type y or n: ')
                 continue
         
+        active = False
+    
+    def unsure(self):
+        choose = input('Unsure about your turtle or your bet? Type "turtle", "bet", or "nevermind": ')
+        if choose.lower() == 'quit':
+            quit()
+        elif choose.lower() == 'turtle':
+            self.chooseTurtle()
+        elif choose.lower() == 'bet':
+            self.setBet()
+        elif choose.lower() == 'nevermind':
+            self.race()
+        else:
+            print('Please type either "turtle", "bet", or "nevermind": ')
+        
     def race(self):
         names = ['Inky', 'Blinky', 'Pinky', 'Clyde']
         results = {}
@@ -81,7 +96,7 @@ class TurtleRace:
         for name in names:
             results[Turtle(name).name] = Turtle(name).time
             
-        order = dict(sorted(results.items(), key=lambda item: item[1]))
+        order = dict(sorted(results.items(), key=lambda item: item[1])) # stackoverflow
         
         for item in order.keys():
             result_names.append(item)
@@ -95,7 +110,9 @@ class TurtleRace:
         
         if result_names[0] == self.turtle:
             self.award_winnings()
-        else: print('Sorry, your chosen turtle (' + self.turtle + ') lost.')
+        else:
+            self.total = self.total - self.bet
+            print('Sorry, your chosen turtle (' + self.turtle + ') lost.')
         
         
     def award_winnings(self):
@@ -113,8 +130,3 @@ class TurtleRace:
         
         print('You won %s!' % amount)
         print('Your total is now %s.' % self.total)
-        
-# 5.21 Inky
-# 4.50 Blinky
-# 3.54 Pinky
-# 3 Clyde
